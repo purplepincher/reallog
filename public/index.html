@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>reallog.ai — Real-world scene logger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+/*
+  family/tokens.css
+  -------------------------------------------------------------------
+  Shared design tokens for the PurplePincher domain family.
+
+  The first block (`:root` ground palette + type system) is extracted
+  verbatim from purplepincher-landing-reference/src/landing.html (the
+  `:root` at lines 13-27). It is the fixed visual baseline for every
+  family site; do not edit it here without also editing the reference.
+
+  The second block (per-site accent variables) names the additional
+  accents from the Round 1 plan (ROUND_1_glm.md, Section 2 table).
+  Each family site overrides `--claw` with the one accent it has chosen
+  (e.g. deckboss.net writes `--claw: var(--antifoul);` in its own
+  site-level `:root`). The variables below are defined so the swap is
+  by name, not by magic hex.
+
+  Pair with family/base.css. Inline at build time; never fetch at
+  runtime. See family/README.md.
+*/
+
+:root {
+  /* --- ground palette + type system (verbatim from landing.html) --- */
+  --ink: #0E1A1C;
+  --ink-deep: #081113;
+  --shell: #F0E9D8;
+  --shell-dim: #C9C0AB;
+  --claw: #A8548C;
+  --claw-deep: #7A3B5E;
+  --lattice: #5FB4C7;
+  --lattice-dim: #3F8FA3;
+  --hardened: #D98B54;
+  --line: rgba(240, 233, 216, 0.14);
+  --display: "Fraunces", Georgia, serif;
+  --body: "IBM Plex Sans", -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", "SF Mono", monospace;
+
+  /* --- per-family-site accents (ROUND_1_glm.md Section 2 table) ---
+     Each site swaps --claw for one of these in its own :root. They are
+     defined here so the swap reads by name. Sites that do not use a
+     given accent simply ignore it; unused variables cost nothing once
+     inlined. */
+
+  /* deckboss.net — anti-fouling bottom-paint oxide. The most confident
+     accent in the table: a real, specific marine color that reads
+     "working vessel" to anyone who knows boats and "warm, weathered,
+     not corporate" to everyone else. Deliberately avoids marine-blue
+     cliché and AI-startup violet. */
+  --antifoul: #B0533A;
+
+  /* cocapn.com — the water under the hull. A deeper blue-green than
+     purplepincher's cyan lattice, distinct from both --ink and
+     --lattice. cocapn.com is the site *about* the boat, so the accent
+     is the water. Keeps the cool family register while being its own. */
+  --depth: #1F4A5C;
+
+  /* superinstance.ai — warm coral / sand-rose. The softest, warmest
+     accent, for the "soft origin" station of the lifecycle.
+     NOTE: superinstance.ai turned out to already have its own real,
+     different visual identity live on Cloudflare Pages — a green-on-
+     black terminal aesthetic. This variable is therefore likely to go
+     UNUSED for superinstance.ai specifically (that site will probably
+     keep its existing palette rather than adopt the family skeleton).
+     It is kept defined here because ROUND_1_glm.md Section 2 named it;
+     removing it would silently contradict the plan. If superinstance.ai
+     does adopt the family skeleton, --reef is the accent the plan
+     assigns it. */
+  --reef: #D97A5C;
+
+  /* cocapn.ai promotes --lattice (cyan) to primary rather than
+     introducing a new accent variable; no new token needed here.
+     See ROUND_1_glm.md Section 2 table and family/README.md. */
+}
+
+/*
+  family/base.css
+  -------------------------------------------------------------------
+  Shared reset, type scale, and the load-bearing component shapes for
+  the PurplePincher domain family. Extracted and generalized from
+  purplepincher-landing-reference/src/landing.html.
+
+  Purplepincher-specific content text has been removed; the CSS
+  structure and class names are preserved verbatim so any family site
+  can reuse them by writing HTML that uses these classes.
+
+  Depends on the tokens defined in family/tokens.css. Inline both
+  files at build time into each site's <style> block; never fetch at
+  runtime. See family/README.md.
+
+  Components provided (the named load-bearing shapes):
+    .eyebrow                    mono section label
+    .chain / .chain-step        numbered sequence (order carries meaning)
+    .ledger / .ledger-row       registry of named things with tags
+    .demo-card                  interactive-surface shell
+    .bar-list                   numbered criteria list
+*/
+
+/* ---------- reset + base type ---------- */
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--shell);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a { color: var(--lattice); }
+a:focus-visible, button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--lattice);
+  outline-offset: 3px;
+}
+
+::selection { background: var(--claw); color: var(--shell); }
+
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* ---------- .eyebrow : mono section label ---------- */
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lattice);
+  margin: 0 0 22px;
+  position: relative;
+}
+
+/* ---------- .chain : a real sequence, numbered because order carries meaning ---------- */
+
+.chain {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 56px 0 8px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.chain-step {
+  flex: 1 1 220px;
+  padding: 22px 20px 22px 0;
+  border-right: 1px solid var(--line);
+}
+.chain-step:last-child { border-right: none; }
+
+.chain-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--lattice-dim);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.chain-step p {
+  margin: 0;
+  font-size: 0.94rem;
+  color: var(--shell-dim);
+}
+
+.chain-step strong {
+  display: block;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: var(--shell);
+  margin-bottom: 4px;
+}
+
+/* ---------- .demo-card : interactive-surface shell ----------
+   The outer shell only. Each site's signature surface lives inside
+   (a canvas, a state machine, a logbook replay, etc.) and is built
+   by that site. The grid gives a primary area + a narrow sidebar
+   (readout / controls); override grid-template-columns in site CSS
+   if your surface needs a different interior layout. */
+
+.demo-card {
+  position: relative;
+  margin-top: 36px;
+  background: rgba(8, 17, 19, 0.55);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 28px;
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 28px;
+  align-items: stretch;
+}
+
+@media (max-width: 680px) {
+  .demo-card { grid-template-columns: 1fr; }
+}
+
+/* ---------- .ledger : real accounting, not decoration ---------- */
+
+.ledger {
+  margin-top: 32px;
+  border-top: 1px solid var(--line);
+}
+
+.ledger-row {
+  display: grid;
+  grid-template-columns: 1.4fr 2.4fr auto;
+  gap: 20px;
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 620px) {
+  .ledger-row { grid-template-columns: 1fr; gap: 6px; }
+}
+
+.ledger-row.flagship {
+  background: linear-gradient(90deg, rgba(217,139,84,0.08), transparent 40%);
+}
+
+.ledger-name {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+.ledger-name a { color: var(--shell); text-decoration: none; border-bottom: 1px solid var(--line); }
+.ledger-name a:hover { border-color: var(--lattice); color: var(--lattice); }
+
+.ledger-desc { font-size: 0.92rem; color: var(--shell-dim); }
+
+.ledger-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--lattice-dim);
+  white-space: nowrap;
+  text-align: right;
+}
+.ledger-tag.hardened { color: var(--hardened); }
+
+/* ---------- .bar-list : the actual mechanism, plainly ---------- */
+
+.bar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: bar;
+}
+
+.bar-list li {
+  counter-increment: bar;
+  position: relative;
+  padding: 14px 0 14px 40px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  color: var(--shell-dim);
+}
+.bar-list li::before {
+  content: counter(bar);
+  position: absolute;
+  left: 0;
+  top: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--lattice-dim);
+  width: 24px;
+}
+.bar-list strong { color: var(--shell); }
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/*
+  family/provenance-panel.css
+  -------------------------------------------------------------------
+  The "what's real here" honesty component for family sites that need
+  it. Packages the mechanism ROUND_1_glm.md Section 2 describes
+  (quoting SYNTHESIS.md:170-176, :416-420): a persistent status line
+  that states the site's overall reality, plus per-element provenance
+  tags that mark individual elements as designed / built / simulated /
+  deterministic / etc.
+
+  This is packaging of already-specified thinking into a reusable
+  component. No new UX mechanics are introduced.
+
+  WHEN TO USE: on sites whose load-bearing claim is "this is real but
+    not yet a product" or "this is honest about what it is" — cocapn.com
+    (vessel design + deterministic simulation), cocapn.ai (portable
+    coordination-theory prompts). The persistent line is the mechanism
+    that prevents the simulation reading as a shipped product.
+  WHEN NOT TO USE: deckboss.net (real shipped product — the honesty
+    framing would be misleading in the other direction, implying doubt
+    where there is none). purplepincher.org does not need it either.
+
+  Depends on tokens from family/tokens.css. Inline at build time
+  alongside tokens.css + base.css on the sites that need it. Sites that
+  do not need it should NOT inline it (keeps their CSS smaller and
+  avoids importing a component whose presence implies doubt).
+
+  Pair with family/provenance-panel.html.
+*/
+
+/* ---------- persistent status line : one per page, near top of <body> ---------- */
+
+.provenance-status {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 28px;
+  background: var(--ink-deep);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--shell-dim);
+}
+
+.provenance-status__word {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  /* --claw picks up whatever accent the site has chosen (each family
+     site overrides --claw with its own accent in its site-level :root). */
+  color: var(--claw);
+  white-space: nowrap;
+}
+
+.provenance-status__text {
+  flex: 1 1 auto;
+  max-width: 70ch;
+}
+
+@media (max-width: 620px) {
+  .provenance-status { padding: 10px 18px; font-size: 11.5px; }
+}
+
+/* ---------- per-element provenance tag : attach to any element whose realness matters ---------- */
+
+.provenance {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--lattice-dim);
+  background: rgba(95, 180, 199, 0.08);
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+/* block variant: for an end-of-section note rather than an inline tag */
+.provenance--block {
+  display: block;
+  margin: 14px 0 0;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 12.5px;
+  color: var(--shell-dim);
+}
+
+:root {
+  /* reallog.ai accent override */
+  --claw: var(--lattice);
+}
+/* site-specific hero shaping */
+.hero { padding: 64px 0 40px; }
+.hero h1 {
+  font-family: var(--display);
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  line-height: 1.05;
+  font-weight: 500;
+  margin: 0 0 18px;
+  color: var(--shell);
+}
+.hero .subhead {
+  font-size: 1.15rem;
+  color: var(--shell-dim);
+  max-width: 68ch;
+  margin: 0 0 28px;
+}
+section { padding: 44px 0; border-top: 1px solid var(--line); }
+section h2 {
+  font-family: var(--display);
+  font-size: 1.7rem;
+  font-weight: 500;
+  margin: 0 0 16px;
+  color: var(--shell);
+}
+section p {
+  max-width: 68ch;
+  color: var(--shell-dim);
+  margin: 0 0 14px;
+}
+section p strong { color: var(--shell); }
+pre {
+  background: var(--ink-deep);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 22px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--shell);
+  margin: 18px 0;
+}
+code { font-family: var(--mono); color: var(--lattice); }
+.install {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--ink-deep);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 8px 0 18px;
+  color: var(--shell);
+}
+.honest {
+  background: rgba(95, 180, 199, 0.06);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-top: 28px;
+}
+.honest p { margin: 0; color: var(--shell-dim); max-width: 72ch; }
+footer {
+  padding: 28px 0 64px;
+  font-size: 0.85rem;
+  color: var(--shell-dim);
+}
+  </style>
+</head>
+<body>
+  <aside class="provenance-status" role="status" aria-live="polite">
+    <span class="provenance-status__word">SCENE LOGGER</span>
+    <span class="provenance-status__text">This is a real PyPI package, and the quickstart above is copied verbatim from its README. It is a working library, not a polished product. The camera-to-text pipeline and PLATO integration are real; a consumer app around them is not shipped yet.</span>
+  </aside>
+
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">reallog.ai</p>
+      <h1>A camera sees; a log remembers where.</h1>
+      <p class="subhead">reallog-agent turns camera events into persistent spatial memory in PLATO, so you can later ask “who came to the front door?” and get an answer grounded in what the camera actually saw.</p>
+    </header>
+
+    <section id="what">
+      <h2>What This Is</h2>
+      <p>Most camera systems are alert machines. They detect motion, send a notification, and then the moment is gone. If you want to know “who came to the front door last Tuesday?” you are left scrubbing video or trusting a fuzzy memory. The recording exists, but the <em>answer</em> does not.</p>
+<p><strong>reallog-agent</strong> is a Real-World Scene Logger. Camera frames are turned into short text descriptions, and those descriptions are written to PLATO as tiles. The result is a queryable memory of the physical world: not raw video, but a structured log of what the camera saw, where, and when.</p>
+<p>Later, an agent can read those tiles and answer questions in plain language. The README also describes “don the shell”—the org's hermit-crab metaphor for one agent session taking over another's viewpoint—so you can ask the system to look from a different camera's perspective.</p>
+    </section>
+
+    <section id="quickstart">
+      <h2>Quickstart</h2>
+      <p><strong>Install the package.</strong></p>
+      <div class="install">pip install reallog-agent</div>
+      <pre><code class="language-python">from reallog_agent import RealLogAgent
+
+agent = RealLogAgent(camera_id=&quot;security_cam_1&quot;)
+agent.log_scene(&quot;front_door&quot;, &quot;person approaching at 14:32&quot;, motion=True)
+agent.log_scene(&quot;back_yard&quot;, &quot;bird detected&quot;, motion=False)
+print(agent.ask(&quot;who came to the front door?&quot;))</code></pre>
+      
+    </section>
+
+    <section class="honest" id="honesty">
+      <h2 class="eyebrow">Honesty Note</h2>
+      <p>This is a real PyPI package, and the quickstart above is copied verbatim from its README. It is a working library, not a polished product. The camera-to-text pipeline and PLATO integration are real; a consumer app around them is not shipped yet.</p>
+    </section>
+
+    <footer>
+      <p>reallog.ai — a real PyPI package. No polished product yet; this page tells the truth about what exists today.</p>
+    </footer>
+  </div>
+</body>
+</html>
