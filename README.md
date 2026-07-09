@@ -114,16 +114,23 @@ About **this repo** (the landing page Worker):
 About the **advertised package** `reallog-agent` (separate repo/PyPI — I
 verified these against PyPI and the upstream GitHub README, not assumed):
 
-- ✅ **Real today:** genuinely published on PyPI as `reallog-agent` `0.1.0`
-  (summary: *"Vision Turbo-Shell for reallog.ai — camera vision → PLATO →
-  agent"*). HTTP 200 on `https://pypi.org/pypi/reallog-agent/json`.
-- ✅ **Quickstart verified verbatim** from the upstream README (see above).
+- ⚠️ **`0.1.0` was published as an empty wheel — do not use it.** The
+  published `0.1.0` wheel on PyPI contained only `dist-info` metadata, no
+  Python source at all (verified by downloading and unzipping it directly).
+  `setuptools` silently packaged nothing due to a missing package-discovery
+  config, compounded by a real bug in the source itself (`__init__` had
+  escaped the class body, didn't accept `camera_id`, and the class never
+  inherited from `BaseAgent`).
+- ✅ **Fixed in `0.1.1`:** both bugs are fixed and verified end-to-end —
+  `RealLogAgent(camera_id=...)` now actually imports and runs, and
+  `log_scene`/`ask` degrade gracefully without a live PLATO server rather
+  than crashing. Require `reallog-agent>=0.1.1`.
 - ⚠️ **Real but not a finished product:** the landing page's **"SCENE LOGGER"**
-  banner is precise — "a working library, not a polished product. The
-  camera-to-text pipeline and PLATO integration are real; a consumer app around
-  them is not shipped yet." I verified the *claims* against the upstream README,
-  but I did **not** execute the package, so I cannot confirm the
-  camera-to-text→PLATO path actually runs end-to-end.
+  banner is accurate as of `0.1.1` — "a working library, not a polished
+  product. The camera-to-text pipeline and PLATO integration are real; a
+  consumer app around them is not shipped yet." The camera-to-text step
+  itself (turning a raw frame into a description) is outside this package's
+  scope — `RealLogAgent` expects the caller to already have that string.
 - 🔮 **Not verified here:** whether PLATO itself (the shared tile-storage /
   agent-memory substrate) is running, and what backs the "camera frames →
   described text" step (an external vision model/service). Those live outside

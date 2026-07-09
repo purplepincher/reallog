@@ -458,7 +458,7 @@ footer {
 <body>
   <aside class="provenance-status" role="status" aria-live="polite">
     <span class="provenance-status__word">SCENE LOGGER</span>
-    <span class="provenance-status__text">This is a real PyPI package, and the quickstart above is copied verbatim from its README. It is a working library, not a polished product. The camera-to-text pipeline and PLATO integration are real; a consumer app around them is not shipped yet.</span>
+    <span class="provenance-status__text">This is a real PyPI package (reallog-agent >= 0.1.1 — the 0.1.0 release was published as an empty wheel due to a packaging bug and does not work; use 0.1.1 or later), and the quickstart above is copied verbatim from its README. It is a working library, not a polished product. The camera-to-text pipeline and PLATO integration are real; a consumer app around them is not shipped yet.</span>
   </aside>
 
   <div class="wrap">
@@ -478,7 +478,7 @@ footer {
     <section id="quickstart">
       <h2>Quickstart</h2>
       <p><strong>Install the package.</strong></p>
-      <div class="install">pip install reallog-agent</div>
+      <div class="install">pip install "reallog-agent>=0.1.1"</div>
       <pre><code class="language-python">from reallog_agent import RealLogAgent
 
 agent = RealLogAgent(camera_id=&quot;security_cam_1&quot;)
@@ -490,7 +490,7 @@ print(agent.ask(&quot;who came to the front door?&quot;))</code></pre>
 
     <section class="honest" id="honesty">
       <h2 class="eyebrow">Honesty Note</h2>
-      <p>This is a real PyPI package, and the quickstart above is copied verbatim from its README. It is a working library, not a polished product. The camera-to-text pipeline and PLATO integration are real; a consumer app around them is not shipped yet.</p>
+      <p>This is a real PyPI package (reallog-agent >= 0.1.1 — the 0.1.0 release was published as an empty wheel due to a packaging bug and does not work; use 0.1.1 or later), and the quickstart above is copied verbatim from its README. It is a working library, not a polished product. The camera-to-text pipeline and PLATO integration are real; a consumer app around them is not shipped yet.</p>
     </section>
 
     <footer>
